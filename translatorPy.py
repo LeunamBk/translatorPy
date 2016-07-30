@@ -10,7 +10,7 @@ Created on Sat Jul 19 18:23:26 2014
 
 #from myForceFocus import *
 
-__file__ = os.path.basename(sys.argv[0])
+
 
 from myKeyboardSim import *
 import goslate
@@ -22,6 +22,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
 
+
+__file__ = os.path.basename(sys.argv[0])
 
 class AppForm(QMainWindow):
      
@@ -88,7 +90,7 @@ class AppForm(QMainWindow):
         SHORTCUT_SHOW = "CTRL+y"  # Ctrl maps to Command on Mac OS X
         #self.selectLab = QLabel(self.shortcut_show, page)
         self.shortcut_show.setShortcut(QKeySequence(SHORTCUT_SHOW))
-        self.shortcut_show.activated.connect(self. transGo)
+        self.shortcut_show.activated.connect(self.transGo)
 
         #check if window is visible...       
         #print self.isVisible()
@@ -129,17 +131,15 @@ class AppForm(QMainWindow):
         w.set_foreground()
 
     def pushDataToClipB(self):
-        # push selected data to clipbord; keyboard hack
-        print "sould have done copy"
-
-
+	# push selected data to clipbord
+        pyperclip.copy(os.popen('xsel').read())
+	
     def getDataFClipB(self):
         # get clipboard data
         # win32clipboard.OpenClipboard()
         # data = win32clipboard.GetClipboardData()
         # win32clipboard.CloseClipboard()
         return pyperclip.paste()
-
      
     def myTranslate(self,word):
         return getGoogleTranslationFromText(self, unicode(word))
