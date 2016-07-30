@@ -21,12 +21,12 @@ def initSelenium(self):
 
 def getGoogleTranslationFromText(self, text):
     import time
-
+    print text+"\n"
     bet_fa = self.browser.find_element_by_id("source")
     bet_fa.clear()
     bet_fa.send_keys(text)
     
     # give google time to translate 
     time.sleep(.700)
-
-    return self.browser.find_element_by_xpath('//*[@id="result_box"]/span').text
+    
+    return self.browser.find_element_by_xpath('//*[@id="result_box"]').text

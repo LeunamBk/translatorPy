@@ -5,7 +5,6 @@ Created on Sat Jul 19 18:23:26 2014
 """
 
 # modules which need to be installed
-#goslate
 #pygs
 
 #from myForceFocus import *
@@ -13,7 +12,6 @@ Created on Sat Jul 19 18:23:26 2014
 
 
 from myKeyboardSim import *
-import goslate
 #import win32clipboard
 from gotransscrapper import getGoogleTranslationFromText, initSelenium
 import pyperclip
@@ -40,7 +38,8 @@ class AppForm(QMainWindow):
         
         # set global hotkey handler
         self.shortcut_show = QxtGlobalShortcut()
-      
+        self.shortcut_close = QxtGlobalShortcut()
+        
         # gui logic
         QMainWindow.__init__(self, parent, Qt.WindowStaysOnTopHint)  
         self.create_main_frame()
@@ -60,7 +59,8 @@ class AppForm(QMainWindow):
         self.tselect.addItems(tList)       
         self.buttonGo = QPushButton('GO', page)
         self.buttonEx = QPushButton('Exit', page)
-         
+        self.msgBoxCloseButton = QPushButton('OK')
+        
         # combobox logic for triggering state
         self.changeIndex()
         self.tselect.activated['QString'].connect(self.setHandle)
@@ -86,15 +86,33 @@ class AppForm(QMainWindow):
         self.buttonEx.setShortcut("ESC")
         self.edit1.setFocus()
         
-        # create global hotkey CTRL+ALT+S for go and CTRL+ALT+F for exit
         SHORTCUT_SHOW = "CTRL+y"  # Ctrl maps to Command on Mac OS X
-        #self.selectLab = QLabel(self.shortcut_show, page)
         self.shortcut_show.setShortcut(QKeySequence(SHORTCUT_SHOW))
         self.shortcut_show.activated.connect(self.transGo)
-
-        #check if window is visible...       
-        #print self.isVisible()
-        
+	SHORTCUT_CLOSE = "CTRL+<"
+        self.shortcut_close.setShortcut(QKeySequence(SHORTCUT_CLOSE))
+        self.shortcut_close.activated.connect(self.closePopUp)
+     
+    
+    def closePopUp(self):
+	self.msgBox.close()
+	# toggle window mini full
+	if self.windowState() == Qt.WindowMinimized:
+	  # Window is minimised. Restore it.
+	  self.setWindowState(Qt.WindowNoState)
+	else:
+	  self.showMinimized()
+	
+    def popupMesgBox(self,text):
+	if hasattr(self, 'msgBox'):
+	  self.msgBox.close()
+        # rebuild with closed deleted button
+	self.msgBoxCloseButton = QPushButton('OK')
+        self.msgBox = QMessageBox()
+        self.msgBox.setText(text)
+        self.msgBox.addButton(self.msgBoxCloseButton, QMessageBox.YesRole)
+        ret = self.msgBox.exec_()
+      
     # combobox logic check state even if unchanged
     def changeIndex(self):
         index = self.tselect.currentIndex()
@@ -106,24 +124,28 @@ class AppForm(QMainWindow):
     # combobox logic
     def setHandle(self,lang):
         self.tlang = self.langDict[str(lang)]
-
-        # init selenium browser
+	# init selenium browser
         initSelenium(self)
          
     def transGo(self):
         if not self.edit1.text():
+	    # check if window is minimized
+	    if self.windowState() == Qt.WindowMinimized:
+		# Window is minimised. Restore it.
+		self.setWindowState(Qt.WindowNoState)
+
             self.pushDataToClipB()
             text = self.getDataFClipB()
             transS = self.myTranslate(text)
+            self.edit1.clear()
         else:
             text = self.edit1.text()
             transS = self.myTranslate(text)
-
-        #self.gainFocusForPU()
+            self.edit1.clear()
+	    #self.gainFocusForPU()
          
         #popup window
-        QMessageBox.about(self, "translation", "%s" % (
-            transS))
+        self.popupMesgBox(transS)
         
     def gainFocusForPU(self):
         w = WindowMgr()
