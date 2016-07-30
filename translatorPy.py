@@ -6,9 +6,9 @@ Created on Sat Jul 19 18:23:26 2014
 
 # modules which need to be installed
 #pygs
+#xsel on system
 
 #from myForceFocus import *
-
 
 
 from myKeyboardSim import *
@@ -106,8 +106,9 @@ class AppForm(QMainWindow):
     def popupMesgBox(self,text):
 	if hasattr(self, 'msgBox'):
 	  self.msgBox.close()
-        # rebuild with closed deleted button
-	self.msgBoxCloseButton = QPushButton('OK')
+	  # rebuild with closed deleted button
+	  self.msgBoxCloseButton = QPushButton('OK')
+        
         self.msgBox = QMessageBox()
         self.msgBox.setText(text)
         self.msgBox.addButton(self.msgBoxCloseButton, QMessageBox.YesRole)
